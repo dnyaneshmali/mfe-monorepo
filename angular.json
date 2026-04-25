@@ -27,9 +27,12 @@
 							}
 						],
 						"styles": [
+							"node_modules/bootstrap/dist/css/bootstrap.min.css",
 							"projects/host-app/src/styles.css"
 						],
-						"scripts": [],
+						"scripts": [
+							"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+						],
 						"main": "projects/host-app/src/main.ts",
 						"extraWebpackConfig": "projects/host-app/webpack.config.js",
 						"commonChunk": false

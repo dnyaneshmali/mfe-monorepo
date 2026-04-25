@@ -1,0 +1,77 @@
+.login-wrapper {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+  overflow: hidden;
+  margin: -1.5rem; /* Compensate for potential container padding in the host */
+}
+
+/* Subtle decorative shapes in background */
+.login-wrapper::before,
+.login-wrapper::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.5;
+  filter: blur(60px);
+}
+
+.login-wrapper::before {
+  width: 400px;
+  height: 400px;
+  background: rgba(13, 110, 253, 0.15);
+  top: -100px;
+  left: -100px;
+}
+
+.login-wrapper::after {
+  width: 300px;
+  height: 300px;
+  background: rgba(102, 16, 242, 0.1);
+  bottom: -50px;
+  right: -50px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+}
+
+.form-floating > .form-control {
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-floating > .form-control:focus {
+  background-color: #ffffff;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn-primary {
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(13, 110, 253, 0.3) !important;
+}
+
+.brand-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}

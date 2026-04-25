@@ -5,7 +5,7 @@ module.exports = withModuleFederationPlugin({
   name: 'loginApp',
 
   exposes: {
-    './Component': './projects/login-app/src/app/app.component.ts',
+    './LoginRoutes': './projects/login-app/src/app/app.routes.ts',
   },
 
   shared: {

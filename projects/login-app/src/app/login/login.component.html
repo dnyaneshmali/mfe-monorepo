@@ -1,0 +1,57 @@
+<div class="login-wrapper d-flex align-items-center justify-content-center min-vh-100 w-100">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card login-card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <div class="brand-icon mx-auto mb-3 bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                <i class="bi bi-shield-lock-fill fs-2"></i>
+              </div>
+              <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+              <p class="text-muted">Please enter your credentials to login</p>
+            </div>
+
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control rounded-3" [ngClass]="{ 'is-invalid': submitted && f['username'].errors }" id="usernameInput" placeholder="Username" formControlName="username">
+                <label for="usernameInput" class="text-muted"><i class="bi bi-person me-2"></i>Username</label>
+                <div *ngIf="submitted && f['username'].errors" class="invalid-feedback px-2">
+                  <div *ngIf="f['username'].errors['required']"><i class="bi bi-exclamation-circle me-1"></i>Username is required</div>
+                  <div *ngIf="f['username'].errors['minlength']"><i class="bi bi-exclamation-circle me-1"></i>Username must be at least 3 characters</div>
+                </div>
+              </div>
+
+              <div class="form-floating mb-4">
+                <input type="password" class="form-control rounded-3" [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" id="passwordInput" placeholder="Password" formControlName="password">
+                <label for="passwordInput" class="text-muted"><i class="bi bi-lock me-2"></i>Password</label>
+                <div *ngIf="submitted && f['password'].errors" class="invalid-feedback px-2">
+                  <div *ngIf="f['password'].errors['required']"><i class="bi bi-exclamation-circle me-1"></i>Password is required</div>
+                  <div *ngIf="f['password'].errors['minlength']"><i class="bi bi-exclamation-circle me-1"></i>Password must be at least 6 characters</div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                  <input class="form-check-input shadow-sm" type="checkbox" value="" id="rememberMe">
+                  <label class="form-check-label text-muted" for="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+                <a href="#" class="text-primary text-decoration-none fw-medium">Forgot Password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm mb-4">
+                Login <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+
+              <div class="text-center text-muted">
+                Don't have an account? <a href="#" class="text-primary text-decoration-none fw-bold">Sign up</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
