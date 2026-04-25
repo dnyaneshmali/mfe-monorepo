@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Component({
     selector: 'app-login',
@@ -13,8 +14,10 @@ import { Router } from "@angular/router";
 export class LoginComponent {
     loginForm: FormGroup;
     submitted = false;
+    errorMessage: string | null = null;
+    isLoading = false;
 
-    constructor(private fb: FormBuilder, private router: Router) {
+    constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
         this.loginForm = this.fb.group({
             username: ['', [Validators.required, Validators.minLength(3)]],
             password: ['', [Validators.required, Validators.minLength(6)]]
@@ -23,15 +26,28 @@ export class LoginComponent {
 
     get f() { return this.loginForm.controls; }
 
-    onSubmit() {
+    async onSubmit() {
         this.submitted = true;
+        this.errorMessage = null;
 
         if (this.loginForm.invalid) {
             return;
         }
 
-        console.log('Login successful', this.loginForm.value);
-        // Simulate a successful login redirect
-        this.router.navigate(['/dashboard']);
+        this.isLoading = true;
+        try {
+            const { username, password } = this.loginForm.value;
+            const user = await this.authService.login(username, password);
+            
+            // Store user details in local storage
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            console.log('Login successful', user);
+            this.router.navigate(['/dashboard']);
+        } catch (error: any) {
+            this.errorMessage = error.message;
+        } finally {
+            this.isLoading = false;
+        }
     }
 }

@@ -8,6 +8,10 @@
       <p class="text-muted small">Authenticate to access models and datasets</p>
     </div>
 
+    <div *ngIf="errorMessage" class="alert alert-danger py-2 small d-flex align-items-center" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
       <div class="mb-3 text-start">
         <label for="usernameInput" class="form-label text-muted small fw-medium mb-1"><i class="bi bi-person me-1"></i>Username</label>
@@ -37,8 +41,9 @@
         <a href="#" class="text-primary text-decoration-none fw-medium">Forgot Password?</a>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-sm w-100 rounded-pill fw-bold shadow-sm mb-3 py-2">
-        Login <i class="bi bi-arrow-right ms-1"></i>
+      <button type="submit" class="btn btn-primary btn-sm w-100 rounded-pill fw-bold shadow-sm mb-3 py-2" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ isLoading ? 'Logging in...' : 'Login' }} <i *ngIf="!isLoading" class="bi bi-arrow-right ms-1"></i>
       </button>
 
       <div class="text-center text-muted small">
