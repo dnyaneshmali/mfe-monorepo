@@ -1,13 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3">
   <div class="container">
-    <a class="navbar-brand fw-bold fs-4" href="#"><i class="bi bi-stars text-warning me-2"></i>AI Lab</a>
+    <a class="navbar-brand fw-bold fs-4" routerLink="/"><i class="bi bi-stars text-warning me-2"></i>AI Lab</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
-        <li class="nav-item">
-          <a class="nav-link active fw-medium" aria-current="page" href="#">Overview</a>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link fw-medium" routerLinkActive="active" routerLink="/dashboard">Dashboard</a>
         </li>
         <li class="nav-item">
           <a class="nav-link fw-medium" href="#">Models</a>
@@ -19,9 +19,21 @@
           <a class="nav-link fw-medium" href="#">Research</a>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <button class="btn btn-light text-primary rounded-pill px-4 fw-bold shadow-sm" type="button">Login</button>
-      </form>
+      <div class="d-flex align-items-center gap-3">
+        <ng-container *ngIf="!isLoggedIn">
+          <a class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm" routerLink="/login">Login</a>
+        </ng-container>
+        
+        <ng-container *ngIf="isLoggedIn">
+          <div class="text-light d-flex align-items-center bg-white bg-opacity-10 px-3 py-1 rounded-pill">
+            <i class="bi bi-person-circle fs-5 me-2 text-warning"></i>
+            <span class="fw-medium small">{{ userName }}</span>
+          </div>
+          <button class="btn btn-outline-light btn-sm rounded-pill px-3 fw-medium shadow-sm" type="button" (click)="logout($event)">
+            <i class="bi bi-box-arrow-right me-1"></i> Logout
+          </button>
+        </ng-container>
+      </div>
     </div>
   </div>
 </nav>
