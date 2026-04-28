@@ -1,33 +1,25 @@
 import { Request, Response } from "express";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export const chatHandler = async (req: Request, res: Response) => {
   try {
     const { message } = req.body;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful assistant."
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ]
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash"
     });
 
-    const reply = response.choices[0].message.content;
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: message }] }]
+    });
 
-    res.json({ reply });
+    res.json({
+      reply: result.response.text()
+    });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Something went wrong" });
   }
