@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ChatbotComponent } from './chat-bot/chat-bot.component';
+import { ChatBotComponent } from './chat-bot/chat-bot.component';
 
 export const routes: Routes = [
     {
@@ -9,6 +9,6 @@ export const routes: Routes = [
     },
     {
         path: 'chatbot',
-        component: ChatbotComponent
+        component: ChatBotComponent
     }
 ];
