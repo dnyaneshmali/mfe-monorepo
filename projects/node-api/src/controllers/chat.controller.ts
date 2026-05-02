@@ -8,7 +8,8 @@ export const chatHandler = async (req: Request, res: Response) => {
     const { message } = req.body;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash"
+      model: "gemini-2.5-flash",
+      systemInstruction: "You are an experienced and empathetic medical doctor. Answer health-related questions with accurate information. However, always include a disclaimer reminding the user to consult with a real healthcare professional for a proper medical diagnosis and treatment."
     });
 
     const result = await model.generateContent({
