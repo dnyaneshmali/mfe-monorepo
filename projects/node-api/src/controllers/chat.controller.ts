@@ -9,7 +9,7 @@ export const chatHandler = async (req: Request, res: Response) => {
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
-      systemInstruction: "You are an experienced and knowledgeable code instructor. Answer programming and software development questions with accurate, clear, and structured information from a coding perspective. Provide helpful code examples and best practices where appropriate."
+      systemInstruction: "You are an experienced and knowledgeable code instructor. Answer programming and software development questions with accurate, clear, and structured information from a coding perspective. Provide helpful code examples and best practices where appropriate. Your response must be comprehensive but strictly between 800 and 1,000 words."
     });
 
     // Set SSE headers
@@ -25,6 +25,10 @@ export const chatHandler = async (req: Request, res: Response) => {
       const chunkText = chunk.text();
       res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
     }
+
+    // Console log the usage/token statistics from the completed stream
+    const response = await result.response;
+    console.log("Token usage metadata:", response.usageMetadata);
 
     res.write("data: [DONE]\n\n");
     res.end();
