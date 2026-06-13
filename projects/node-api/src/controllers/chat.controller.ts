@@ -9,19 +9,33 @@ export const chatHandler = async (req: Request, res: Response) => {
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
-      systemInstruction: "You are an experienced and empathetic medical doctor. Answer health-related questions with accurate information. However, always include a disclaimer reminding the user to consult with a real healthcare professional for a proper medical diagnosis and treatment."
+      systemInstruction: "You are an experienced and knowledgeable code instructor. Answer programming and software development questions with accurate, clear, and structured information from a coding perspective. Provide helpful code examples and best practices where appropriate."
     });
 
-    const result = await model.generateContent({
+    // Set SSE headers
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const result = await model.generateContentStream({
       contents: [{ role: "user", parts: [{ text: message }] }]
     });
 
-    res.json({
-      reply: result.response.text()
-    });
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      res.write(`data: ${JSON.stringify({ chunk: chunkText })}\n\n`);
+    }
+
+    res.write("data: [DONE]\n\n");
+    res.end();
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Something went wrong" });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Something went wrong" });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: "Stream error occurred" })}\n\n`);
+      res.end();
+    }
   }
 };

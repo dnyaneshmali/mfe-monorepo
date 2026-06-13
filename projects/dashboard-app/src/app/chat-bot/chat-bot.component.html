@@ -15,21 +15,23 @@
 
     <!-- Chat Area -->
     <div class="chat-area">
-        <div class="messages">
+        <div class="messages" (click)="handleChatClick($event)">
             <div *ngIf="messages.length === 0" class="empty-state">
                 <h2>How can I help you today?</h2>
-                <p>Select a chat or start a new conversation.</p>
+                <p>Select a chat or start a new programming conversation.</p>
             </div>
-            <div *ngFor="let msg of messages" [ngClass]="msg.role">
-                <div class="bubble">
+            <div *ngFor="let msg of messages" [ngClass]="[msg.role, msg.isStreaming ? 'streaming' : '']">
+                <div class="bubble" *ngIf="msg.role === 'user'">
                     {{ msg.content }}
+                </div>
+                <div class="bubble" *ngIf="msg.role === 'bot'" [innerHTML]="msg.htmlContent">
                 </div>
             </div>
         </div>
 
         <div class="input-container">
             <div class="input-box">
-                <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type your health-related question..." />
+                <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Ask a programming question (HTML, JS, CSS, Python...)" />
                 <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim()">Send</button>
             </div>
         </div>
