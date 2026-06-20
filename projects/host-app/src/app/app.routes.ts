@@ -17,6 +17,11 @@ export const routes: Routes = [
       }).then(m => m.routes),
   },
   {
+    path: 'suggest-subji',
+    redirectTo: 'dashboard/suggest-subji',
+    pathMatch: 'full'
+  },
+  {
     path: 'dashboard',
     loadChildren: () =>
       loadRemoteModule({

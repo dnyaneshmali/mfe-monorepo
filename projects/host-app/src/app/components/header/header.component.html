@@ -11,7 +11,10 @@
           <a class="nav-link fw-medium" routerLinkActive="active" routerLink="/dashboard">Dashboard</a>
         </li>
         <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link fw-medium" routerLink="/dashboard/chatbot">ChatBot</a>
+          <a class="nav-link fw-medium" routerLinkActive="active" routerLink="/dashboard/chatbot">ChatBot</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link fw-medium" routerLinkActive="active" routerLink="/dashboard/suggest-subji">Suggest My Subji</a>
         </li>
         <li class="nav-item" *ngIf="isLoggedIn">
           <a class="nav-link fw-medium" routerLink="/dashboard">Datasets</a>

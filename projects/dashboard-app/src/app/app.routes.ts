@@ -10,5 +10,9 @@ export const routes: Routes = [
     {
         path: 'chatbot',
         component: ChatBotComponent
+    },
+    {
+        path: 'suggest-subji',
+        loadComponent: () => import('../suggest-subji-ai/suggest-subji.component').then(m => m.SuggestSubjiComponent)
     }
 ];

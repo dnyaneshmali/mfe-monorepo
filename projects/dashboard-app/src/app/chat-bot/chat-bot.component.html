@@ -38,7 +38,7 @@
                     <div class="message-content">
                         <div class="author-name">{{ msg.role === 'user' ? 'You' : 'Instructor' }}</div>
                         <div class="message-text" *ngIf="msg.role === 'user'">{{ msg.content }}</div>
-                        <div class="message-text" *ngIf="msg.role === 'bot'" [innerHTML]="msg.htmlContent"></div>
+                        <markdown class="message-text" *ngIf="msg.role === 'bot'" [data]="msg.content"></markdown>
                     </div>
                 </div>
             </div>

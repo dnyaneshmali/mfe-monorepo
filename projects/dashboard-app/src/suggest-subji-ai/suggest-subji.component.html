@@ -1,0 +1,386 @@
+<div class="suggest-container">
+  <!-- Page Header -->
+  <header class="page-header text-center">
+    <h1 class="page-title">🥗 Suggest My Subji</h1>
+    <p class="page-subtitle">
+      Tell us what's available in your kitchen and we'll suggest the perfect dish for today.
+    </p>
+  </header>
+
+  <div class="cards-grid">
+    <!-- Card 1: Location -->
+    <mat-card class="subji-card glass-card">
+      <mat-card-header>
+        <mat-card-title class="d-flex align-items-center">
+          <mat-icon class="me-2 text-primary">place</mat-icon>
+          Location
+        </mat-card-title>
+        <mat-card-subtitle>Let us know your general location to recommend local styles</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content class="card-body-content">
+        <div class="location-section">
+          <!-- Option 1: Geolocation -->
+          <div class="gps-container text-center">
+            <button mat-flat-button color="primary" 
+                    class="gps-btn"
+                    (click)="useCurrentLocation()" 
+                    [disabled]="isLoading || loadingLocation">
+              <mat-icon class="btn-icon">my_location</mat-icon>
+              <span>📍 Use Current Location</span>
+            </button>
+
+            <!-- Loading Geolocation state -->
+            <div *ngIf="loadingLocation" class="gps-loading mt-2">
+              <mat-spinner diameter="20" class="d-inline-block me-2"></mat-spinner>
+              <span class="small text-muted">Retrieving GPS coordinates...</span>
+            </div>
+
+            <!-- Display coordinates if retrieved -->
+            <div *ngIf="latitude !== null && longitude !== null" class="gps-coordinates mt-3 p-3 rounded bg-light border">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="text-start">
+                  <div class="small fw-semibold text-success d-flex align-items-center">
+                    <mat-icon class="me-1 small-icon text-success">check_circle</mat-icon> GPS Active
+                  </div>
+                  <div class="coords-text font-monospace mt-1">
+                    Latitude : {{ latitude | number:'1.5-5' }}
+                  </div>
+                  <div class="coords-text font-monospace">
+                    Longitude : {{ longitude | number:'1.5-5' }}
+                  </div>
+                </div>
+                <button mat-icon-button color="warn" (click)="clearGPS()" [disabled]="isLoading" aria-label="Clear GPS Location">
+                  <mat-icon>clear</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider-container">
+            <span class="divider-line"></span>
+            <span class="divider-text">OR</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- Option 2: Manual Location -->
+          <div class="manual-container">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>Enter City / Place</mat-label>
+              <input matInput 
+                     [(ngModel)]="location" 
+                     (ngModelChange)="onManualLocationChange($event)"
+                     placeholder="e.g. Pune" 
+                     [disabled]="isLoading || (latitude !== null && longitude !== null)"
+                     aria-label="Enter City or Place manually">
+              <mat-icon matSuffix class="text-muted">location_city</mat-icon>
+              <mat-hint *ngIf="latitude !== null">Manual input disabled while GPS location is active</mat-hint>
+              <mat-hint *ngIf="latitude === null">Type a place name (e.g. Pune, Mumbai)</mat-hint>
+            </mat-form-field>
+
+            <!-- Validation feedback for location -->
+            <div class="validation-message mt-2" *ngIf="latitude === null && !location.trim() && hasSearched">
+              <span class="text-danger small d-flex align-items-center">
+                <mat-icon class="me-1 small-icon">error_outline</mat-icon> Location is required. Use current location or enter manually.
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card 2: Meal Preference -->
+    <mat-card class="subji-card glass-card">
+      <mat-card-header>
+        <mat-card-title class="d-flex align-items-center">
+          <mat-icon class="me-2 text-accent">restaurant</mat-icon>
+          Meal Preference
+        </mat-card-title>
+        <mat-card-subtitle>Select your culinary preference</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="card-body-content text-center py-4">
+        <div class="mb-4">
+          <span class="small fw-semibold text-muted d-block mb-2">Diet Preference</span>
+          <mat-radio-group [(ngModel)]="mealPreference" [disabled]="isLoading" aria-label="Select meal preference">
+            <div class="radio-buttons-container">
+              <mat-radio-button value="Veg" class="pref-radio font-medium">
+                <span class="badge-dot veg-dot"></span> Veg
+              </mat-radio-button>
+              <mat-radio-button value="Non Veg" class="pref-radio font-medium">
+                <span class="badge-dot nonveg-dot"></span> Non Veg
+              </mat-radio-button>
+            </div>
+          </mat-radio-group>
+        </div>
+
+        <mat-divider class="my-3"></mat-divider>
+
+        <div class="mt-3">
+          <span class="small fw-semibold text-muted d-block mb-2">Meal Type</span>
+          <mat-radio-group [(ngModel)]="mealType" [disabled]="isLoading" aria-label="Select meal type">
+            <div class="radio-buttons-container">
+              <mat-radio-button value="Breakfast" class="pref-radio font-medium">🍳 Breakfast</mat-radio-button>
+              <mat-radio-button value="Lunch" class="pref-radio font-medium">🍱 Lunch</mat-radio-button>
+              <mat-radio-button value="Dinner" class="pref-radio font-medium">🍛 Dinner</mat-radio-button>
+            </div>
+          </mat-radio-group>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card 3: Available Vegetables -->
+    <mat-card class="subji-card glass-card">
+      <mat-card-header>
+        <mat-card-title class="d-flex align-items-center">
+          <mat-icon class="me-2 text-success">shopping_basket</mat-icon>
+          Available Vegetables / Ingredients
+        </mat-card-title>
+        <mat-card-subtitle>What vegetables do you have in your kitchen right now?</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="card-body-content">
+        <div class="ingredients-section">
+          <!-- Quick Add Tag Helpers -->
+          <div class="quick-add mb-3">
+            <span class="small text-muted me-2">Quick Add:</span>
+            <div class="quick-chips">
+              <button *ngFor="let item of ['Potato', 'Tomato', 'Onion', 'Paneer', 'Capsicum']"
+                      type="button"
+                      class="quick-add-chip"
+                      [disabled]="isLoading"
+                      (click)="insertVeg(item)">
+                + {{item}}
+              </button>
+            </div>
+          </div>
+
+          <!-- Mat Chips Input -->
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Add vegetable...</mat-label>
+            <mat-chip-grid #chipGrid aria-label="Vegetable and ingredient list">
+              <mat-chip-row *ngFor="let veg of vegetables" 
+                            (removed)="removeVegetable(veg)"
+                            [disabled]="isLoading"
+                            class="veg-chip">
+                {{ veg }}
+                <button matChipRemove [attr.aria-label]="'remove ' + veg">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+              
+              <input [matChipInputFor]="chipGrid"
+                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                     (matChipInputTokenEnd)="addVegetable($event)"
+                     [(ngModel)]="vegInput"
+                     [disabled]="isLoading"
+                     placeholder="Add vegetable..."
+                     aria-label="New vegetable input">
+            </mat-chip-grid>
+            <button mat-icon-button matSuffix 
+                    (click)="addVegBtnClick()" 
+                    [disabled]="!vegInput.trim() || isLoading" 
+                    title="Add vegetable to list"
+                    aria-label="Add vegetable">
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-form-field>
+          
+          <p class="helper-text mt-1 text-muted small">
+            Add all vegetables or ingredients currently available in your kitchen. Press Enter, Comma, or click the + button to add.
+          </p>
+
+          <!-- Validation feedback for chips -->
+          <div class="validation-message mt-2" *ngIf="vegetables.length === 0 && hasSearched">
+            <span class="text-danger small d-flex align-items-center">
+              <mat-icon class="me-1 small-icon">error_outline</mat-icon> At least one vegetable or ingredient is required.
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card 4: Action Button -->
+    <div class="action-card-container text-center my-4">
+      <button mat-raised-button 
+              color="accent" 
+              class="suggest-btn py-3 px-5 fw-bold"
+              [disabled]="!isFormValid()" 
+              (click)="suggestSubji()">
+        <span class="d-flex align-items-center justify-content-center">
+          <mat-icon class="me-2" *ngIf="!isLoading">search</mat-icon>
+          <span class="fs-5">{{ isLoading ? 'Finding Best Subji...' : 'Suggest My Subji' }}</span>
+        </span>
+      </button>
+
+      <!-- Centered Progress Spinner when searching -->
+      <div *ngIf="isLoading" class="spinner-container mt-4">
+        <mat-spinner diameter="50" class="mx-auto"></mat-spinner>
+        <p class="mt-2 text-muted fw-medium animate-pulse">Analyzing ingredients and matching local recipes...</p>
+      </div>
+    </div>
+
+    <!-- Success Area (Results) -->
+    <mat-card class="subji-card results-card mt-3" [class.success-gradient]="suggestions.length > 0">
+      <mat-card-header>
+        <mat-card-title class="d-flex align-items-center">
+          <mat-icon class="me-2 text-warning">local_dining</mat-icon>
+          Recommended Subji
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content class="card-body-content">
+        <!-- Initial / Empty State -->
+        <div *ngIf="suggestions.length === 0 && !isLoading" class="empty-results text-center py-5">
+          <div class="empty-icon-wrapper mb-3">
+            <mat-icon class="empty-icon text-muted">restaurant_menu</mat-icon>
+          </div>
+          <h4 class="text-muted fw-semibold">No recommendation yet.</h4>
+          <p class="text-muted small px-3">
+            Add ingredients, select your location & preferences, then click "Suggest My Subji" to view your recipe.
+          </p>
+        </div>
+
+        <!-- Success Suggestion Display -->
+        <div *ngIf="suggestions.length > 0 && !isLoading" class="recipe-suggestion-panel animate-fade-in">
+          
+          <!-- Weather Widget (Dynamic from API) -->
+          <div *ngIf="weather" class="weather-widget mb-4 p-3 rounded d-flex align-items-center bg-info bg-opacity-10 border border-info border-opacity-35">
+            <mat-icon class="text-info me-2">cloud_queue</mat-icon>
+            <div class="small">
+              <span class="fw-bold">Current Local Weather:</span> {{ weather.temperature }}°C, {{ weather.condition }}
+              <span class="text-muted ms-1">— Recommendations are optimized for this climate condition.</span>
+            </div>
+          </div>
+
+          <!-- Tabs to toggle between suggestions -->
+          <div class="suggestion-tabs mb-4">
+            <span class="small fw-semibold text-muted d-block mb-2">Select a suggested recipe:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button *ngFor="let sug of suggestions; let idx = index" 
+                      mat-stroked-button
+                      type="button"
+                      [color]="activeSuggestionIndex === idx ? 'primary' : ''"
+                      [class.active-tab]="activeSuggestionIndex === idx"
+                      class="suggestion-tab-btn"
+                      (click)="activeSuggestionIndex = idx">
+                <mat-icon class="me-1" *ngIf="activeSuggestionIndex === idx">check_circle</mat-icon>
+                {{ sug.subji }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Recipe details -->
+          <ng-container *ngIf="suggestions[activeSuggestionIndex] as activeSuggestion">
+            <div class="recipe-header-block d-flex flex-column flex-sm-row justify-content-between align-items-sm-start mb-4">
+              <div class="recipe-title-wrapper d-flex align-items-center">
+                <span class="recipe-emoji me-3">{{ getEmojiForDish(activeSuggestion.subji) }}</span>
+                <div>
+                  <h3 class="recipe-name text-dark fw-bold mb-1">{{ activeSuggestion.subji }}</h3>
+                  <span class="badge rounded-pill bg-success-light text-success border border-success px-3 py-1 small fw-medium">
+                    {{ activeSuggestion.difficulty }} Recipe
+                  </span>
+                </div>
+              </div>
+              <div class="match-score-radial text-center mt-3 mt-sm-0">
+                <div class="score-number">{{ getMatchPercentage(activeSuggestion) }}%</div>
+                <div class="score-label text-muted">Ingredients Match</div>
+              </div>
+            </div>
+
+            <!-- Recommendation Reason Tip-Box -->
+            <div class="reason-tipbox mb-4 p-3 rounded border">
+              <div class="small fw-semibold text-primary d-flex align-items-center mb-1">
+                <mat-icon class="me-1 small-icon">lightbulb</mat-icon> Why this is suggested:
+              </div>
+              <p class="recipe-reason-text mb-0 small text-muted">
+                {{ activeSuggestion.reason }}
+              </p>
+            </div>
+
+            <p class="recipe-desc text-muted mb-4 fs-6">{{ activeSuggestion.description }}</p>
+
+            <!-- Cooking Time -->
+            <div class="time-block d-flex gap-4 mb-4 p-3 rounded bg-white bg-opacity-50 border">
+              <div class="time-item d-flex align-items-center">
+                <mat-icon class="text-muted me-2">schedule</mat-icon>
+                <div>
+                  <div class="small text-muted">Est. Cook Time</div>
+                  <div class="fw-semibold">{{ activeSuggestion.estimatedCookingTime }}</div>
+                </div>
+              </div>
+              <span class="time-divider"></span>
+              <div class="time-item d-flex align-items-center">
+                <mat-icon class="text-muted me-2">fitness_center</mat-icon>
+                <div>
+                  <div class="small text-muted">Difficulty</div>
+                  <div class="fw-semibold">{{ activeSuggestion.difficulty }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ingredients Matching List -->
+            <div class="ingredients-list-grid row mb-4">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <div class="fw-bold text-success d-flex align-items-center mb-2">
+                  <mat-icon class="me-1">check_circle_outline</mat-icon>
+                  Ingredients you have ({{ getMatchedIngredients(activeSuggestion).length }}):
+                </div>
+                <ul class="ingredient-bullets matched-bullets ps-3">
+                  <li *ngFor="let item of getMatchedIngredients(activeSuggestion)" class="text-dark small py-1 capitalize">
+                    {{ item }}
+                  </li>
+                  <li *ngIf="getMatchedIngredients(activeSuggestion).length === 0" class="text-muted small italic list-unstyled">
+                    None of the added ingredients match this recipe.
+                  </li>
+                </ul>
+              </div>
+
+              <div class="col-md-6">
+                <div class="fw-bold text-secondary d-flex align-items-center mb-2">
+                  <mat-icon class="me-1">info_outline</mat-icon>
+                  Other ingredients needed ({{ getNeededIngredients(activeSuggestion).length }}):
+                </div>
+                <ul class="ingredient-bullets needed-bullets ps-3">
+                  <li *ngFor="let item of getNeededIngredients(activeSuggestion)" class="text-dark small py-1 capitalize">
+                    {{ item }}
+                  </li>
+                  <li *ngIf="getNeededIngredients(activeSuggestion).length === 0" class="text-muted small italic list-unstyled">
+                    No extra ingredients needed! You have everything.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- YouTube Video Recipes Recommendation Section -->
+          <div *ngIf="youtubeVideos && youtubeVideos.length > 0" class="youtube-section mt-5 border-top pt-4">
+            <h4 class="fw-bold text-dark d-flex align-items-center mb-3">
+              <mat-icon class="me-2 text-danger">play_circle_filled</mat-icon>
+              Video Recipes on YouTube
+            </h4>
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+              <div class="col" *ngFor="let video of youtubeVideos">
+                <a [href]="video.url" target="_blank" class="video-card-link text-decoration-none" title="Watch on YouTube">
+                  <div class="video-card border rounded overflow-hidden bg-white shadow-sm h-100 transition-all duration-300">
+                    <div class="video-thumbnail-wrapper position-relative">
+                      <img [src]="video.thumbnail" [alt]="video.title" class="w-100 img-fluid d-block">
+                      <div class="video-play-overlay position-absolute top-50 start-50 translate-middle">
+                        <mat-icon class="play-icon text-white fs-1">play_circle_outline</mat-icon>
+                      </div>
+                    </div>
+                    <div class="p-3">
+                      <h6 class="video-title text-dark small fw-semibold mb-0 line-clamp-2">{{ video.title }}</h6>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

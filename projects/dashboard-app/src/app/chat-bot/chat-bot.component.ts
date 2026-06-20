@@ -1,22 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, SecurityContext } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChatbotService } from '../services/chatbot.service';
 import { marked } from 'marked';
+import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
+import * as hljs from 'highlight.js';
+
+// Register highlight.js globally for ngx-markdown syntax highlighting
+(window as any).hljs = hljs;
 
 interface Message {
   role: 'user' | 'bot';
   content: string;
   isStreaming?: boolean;
-  htmlContent?: SafeHtml;
 }
 
 // SVG Icons as strings for the copy button
-const copyIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; vertical-align: middle;"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4C10.8954 4 10 4.89543 10 6H14C14 4.89543 13.1046 4 12 4ZM8.53516 6C8.83161 4.27712 10.306 3 12 3C13.694 3 15.1684 4.27712 15.4648 6H17.25C18.7964 6 20.05 7.2536 20.05 8.8V17.2C20.05 18.7464 18.7964 20 17.25 20H6.75C5.2036 20 3.95 18.7464 3.95 17.2V8.8C3.95 7.2536 5.2036 6 6.75 6H8.53516ZM6.75 7.5C6.03203 7.5 5.45 8.08203 5.45 8.8V17.2C5.45 17.918 6.03203 18.5 6.75 18.5H17.25C17.968 18.5 18.55 17.918 18.55 17.2V8.8C18.55 8.08203 17.968 7.5 17.25 7.5H6.75Z" fill="currentColor"></path></svg>Copy code`;
-const checkIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; vertical-align: middle;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"></path></svg>Copied!`;
+const copyIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+const checkIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
-// Set up marked custom renderer
+// Set up marked custom renderer for ngx-markdown
 const renderer = new marked.Renderer();
 renderer.code = (token: any) => {
   let code = '';
@@ -39,14 +42,29 @@ renderer.code = (token: any) => {
   return `
     <div class="code-block-wrapper">
       <div class="code-block-header">
-        <span class="code-block-lang">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; vertical-align: middle;">
-            <path d="M9.4 16.6L4.8 12L9.4 7.4L8 6L2 12L8 18L9.4 16.6ZM14.6 16.6L19.2 12L14.6 7.4L16 6L22 12L16 18L14.6 16.6Z" fill="currentColor"></path>
-          </svg>${lang || 'code'}
-        </span>
-        <button class="copy-code-btn" type="button">
-          ${copyIconSvg}
-        </button>
+        <div class="code-block-left">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="file-icon" style="margin-right: 6px; vertical-align: middle;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="code-block-lang">${(lang || 'code').toUpperCase()}</span>
+        </div>
+        <div class="code-block-actions">
+          <button class="action-btn-circle" type="button" aria-label="Code structure">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </button>
+          <button class="action-btn" type="button" aria-label="Run code">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+          <button class="copy-code-btn" type="button" aria-label="Copy code">
+            ${copyIconSvg}
+          </button>
+        </div>
       </div>
       <pre><code>${escapedCode}</code></pre>
     </div>
@@ -59,7 +77,12 @@ marked.use({ renderer, breaks: true, gfm: true });
   selector: 'app-chat-bot',
   templateUrl: './chat-bot.component.html',
   styleUrls: ['./chat-bot.component.css'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MarkdownComponent],
+  providers: [
+    provideMarkdown({
+      sanitize: SecurityContext.NONE
+    })
+  ]
 })
 export class ChatBotComponent implements OnInit {
 
@@ -71,10 +94,7 @@ export class ChatBotComponent implements OnInit {
 
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
-  constructor(
-    private chatbotService: ChatbotService,
-    private sanitizer: DomSanitizer
-  ) {}
+  constructor(private chatbotService: ChatbotService) {}
 
   ngOnInit() {
     this.loadFromStorage();
@@ -101,8 +121,7 @@ export class ChatBotComponent implements OnInit {
     const botMsg: Message = {
       role: 'bot',
       content: '',
-      isStreaming: true,
-      htmlContent: this.sanitizer.bypassSecurityTrustHtml('')
+      isStreaming: true
     };
     this.messages.push(botMsg);
 
@@ -110,22 +129,17 @@ export class ChatBotComponent implements OnInit {
     this.chatbotService.sendMessageStream(messageToSend).subscribe({
       next: (chunk: string) => {
         botMsg.content += chunk;
-        const rawHtml = marked.parse(botMsg.content) as string;
-        botMsg.htmlContent = this.sanitizer.bypassSecurityTrustHtml(rawHtml);
         this.scrollToBottomIfNeeded();
       },
       error: (error) => {
         console.error(error);
         botMsg.isStreaming = false;
         botMsg.content = 'Something went wrong. Please try again.';
-        botMsg.htmlContent = this.sanitizer.bypassSecurityTrustHtml(botMsg.content);
         this.saveChat();
         this.scrollToBottomIfNeeded();
       },
       complete: () => {
         botMsg.isStreaming = false;
-        const rawHtml = marked.parse(botMsg.content) as string;
-        botMsg.htmlContent = this.sanitizer.bypassSecurityTrustHtml(rawHtml);
         this.saveChat();
         this.scrollToBottomIfNeeded();
       }
@@ -221,19 +235,7 @@ export class ChatBotComponent implements OnInit {
   loadFromStorage() {
     const data = localStorage.getItem('chatHistory');
     if (data) {
-      const parsedHistory = JSON.parse(data) as Message[][];
-      this.chatHistory = parsedHistory.map(chat => 
-        chat.map(msg => {
-          if (msg.role === 'bot') {
-            const rawHtml = marked.parse(msg.content) as string;
-            return {
-              ...msg,
-              htmlContent: this.sanitizer.bypassSecurityTrustHtml(rawHtml)
-            };
-          }
-          return msg;
-        })
-      );
+      this.chatHistory = JSON.parse(data) as Message[][];
     }
   }
 }

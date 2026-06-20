@@ -28,7 +28,8 @@
 						],
 						"styles": [
 							"node_modules/bootstrap/dist/css/bootstrap.min.css",
-							"projects/host-app/src/styles.css"
+							"projects/host-app/src/styles.css",
+							"node_modules/highlight.js/styles/github.css"
 						],
 						"scripts": [
 							"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
@@ -228,7 +229,8 @@
 							}
 						],
 						"styles": [
-							"projects/dashboard-app/src/styles.css"
+							"projects/dashboard-app/src/styles.css",
+							"node_modules/highlight.js/styles/github.css"
 						],
 						"scripts": [],
 						"main": "projects/dashboard-app/src/main.ts",
@@ -245,8 +247,8 @@
 								},
 								{
 									"type": "anyComponentStyle",
-									"maximumWarning": "4kB",
-									"maximumError": "8kB"
+									"maximumWarning": "15kB",
+									"maximumError": "30kB"
 								}
 							],
 							"outputHashing": "all",
