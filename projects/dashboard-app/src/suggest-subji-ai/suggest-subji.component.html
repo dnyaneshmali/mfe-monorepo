@@ -352,32 +352,32 @@
                 </ul>
               </div>
             </div>
-          </ng-container>
 
-          <!-- YouTube Video Recipes Recommendation Section -->
-          <div *ngIf="youtubeVideos && youtubeVideos.length > 0" class="youtube-section mt-5 border-top pt-4">
-            <h4 class="fw-bold text-dark d-flex align-items-center mb-3">
-              <mat-icon class="me-2 text-danger">play_circle_filled</mat-icon>
-              Video Recipes on YouTube
-            </h4>
-            <div class="row row-cols-1 row-cols-md-3 g-3">
-              <div class="col" *ngFor="let video of youtubeVideos">
-                <a [href]="video.url" target="_blank" class="video-card-link text-decoration-none" title="Watch on YouTube">
-                  <div class="video-card border rounded overflow-hidden bg-white shadow-sm h-100 transition-all duration-300">
-                    <div class="video-thumbnail-wrapper position-relative">
-                      <img [src]="video.thumbnail" [alt]="video.title" class="w-100 img-fluid d-block">
-                      <div class="video-play-overlay position-absolute top-50 start-50 translate-middle">
-                        <mat-icon class="play-icon text-white fs-1">play_circle_outline</mat-icon>
+            <!-- YouTube Video Recipes Recommendation Section -->
+            <div *ngIf="activeSuggestion.youtube && activeSuggestion.youtube.length > 0" class="youtube-section mt-5 border-top pt-4">
+              <h4 class="fw-bold text-dark d-flex align-items-center mb-3">
+                <mat-icon class="me-2 text-danger">play_circle_filled</mat-icon>
+                Video Recipes on YouTube for {{ activeSuggestion.subji }}
+              </h4>
+              <div class="row row-cols-1 row-cols-md-3 g-3">
+                <div class="col" *ngFor="let video of activeSuggestion.youtube">
+                  <a [href]="video.url" target="_blank" class="video-card-link text-decoration-none" title="Watch on YouTube">
+                    <div class="video-card border rounded overflow-hidden bg-white shadow-sm h-100 transition-all duration-300">
+                      <div class="video-thumbnail-wrapper position-relative">
+                        <img [src]="video.thumbnail" [alt]="video.title" class="w-100 img-fluid d-block">
+                        <div class="video-play-overlay position-absolute top-50 start-50 translate-middle">
+                          <mat-icon class="play-icon text-white fs-1">play_circle_outline</mat-icon>
+                        </div>
+                      </div>
+                      <div class="p-3">
+                        <h6 class="video-title text-dark small fw-semibold mb-0 line-clamp-2">{{ video.title }}</h6>
                       </div>
                     </div>
-                    <div class="p-3">
-                      <h6 class="video-title text-dark small fw-semibold mb-0 line-clamp-2">{{ video.title }}</h6>
-                    </div>
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          </ng-container>
 
         </div>
       </mat-card-content>

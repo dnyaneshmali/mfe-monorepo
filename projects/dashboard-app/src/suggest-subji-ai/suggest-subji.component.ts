@@ -19,15 +19,6 @@ interface Weather {
   condition: string;
 }
 
-interface ApiSuggestion {
-  subji: string;
-  reason: string;
-  description: string;
-  ingredients: string[];
-  estimatedCookingTime: string;
-  difficulty: string;
-}
-
 interface YoutubeVideo {
   title: string;
   videoId: string;
@@ -35,11 +26,20 @@ interface YoutubeVideo {
   url: string;
 }
 
+interface ApiSuggestion {
+  subji: string;
+  reason: string;
+  description: string;
+  ingredients: string[];
+  estimatedCookingTime: string;
+  difficulty: string;
+  youtube?: YoutubeVideo[];
+}
+
 interface ApiResponse {
   success: boolean;
   weather?: Weather;
   suggestions: ApiSuggestion[];
-  youtube?: YoutubeVideo[];
 }
 
 @Component({
@@ -90,7 +90,6 @@ export class SuggestSubjiComponent implements OnInit {
   // API Response States
   weather: Weather | null = null;
   suggestions: ApiSuggestion[] = [];
-  youtubeVideos: YoutubeVideo[] = [];
   activeSuggestionIndex = 0;
 
   ngOnInit(): void {
@@ -218,7 +217,6 @@ export class SuggestSubjiComponent implements OnInit {
     this.hasSearched = false;
     this.weather = null;
     this.suggestions = [];
-    this.youtubeVideos = [];
     this.activeSuggestionIndex = 0;
 
     // Map request payload dynamically based on location selection type
@@ -246,7 +244,6 @@ export class SuggestSubjiComponent implements OnInit {
         if (response && response.success) {
           this.weather = response.weather || null;
           this.suggestions = response.suggestions || [];
-          this.youtubeVideos = response.youtube || [];
           this.activeSuggestionIndex = 0;
 
           this.snackBar.open('✨ Suggested the best Subjis based on your ingredients!', 'Great', {
